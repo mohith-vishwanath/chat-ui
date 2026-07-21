@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { AlertCircle, Hexagon, MessageSquare } from "lucide-react";
+import { AlertCircle, Hexagon, MessageSquare, User } from "lucide-react";
 
 interface Chat {
   id: string;
@@ -11,12 +11,19 @@ interface Chat {
   workflow_id: string;
 }
 
+interface UserProfile {
+  first_name: string;
+  last_name: string;
+  email: string;
+}
+
 export default function Home() {
   const router = useRouter();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [chats, setChats] = useState<Chat[]>([]);
   const [isLoadingChats, setIsLoadingChats] = useState(true);
   const [chatsError, setChatsError] = useState(false);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
 
   useEffect(() => {
     const fetchChats = async (token: string) => {
@@ -42,12 +49,31 @@ export default function Home() {
       }
     };
 
+    const fetchProfile = async (token: string) => {
+      try {
+        const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "";
+        const response = await fetch(`${backendUrl}/api/auth/me`, {
+          headers: {
+            "Authorization": `Bearer ${token}`,
+          }
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setUserProfile(data);
+        }
+      } catch (err) {
+        console.error("Failed to fetch profile:", err);
+      }
+    };
+
     const token = localStorage.getItem("access_token");
     if (!token) {
       router.push("/login");
     } else {
       setIsAuthenticated(true);
       fetchChats(token);
+      fetchProfile(token);
     }
   }, [router]);
 
@@ -58,6 +84,9 @@ export default function Home() {
       </main>
     );
   }
+
+  const userInitial = userProfile?.first_name?.[0]?.toUpperCase() || "";
+  const fullName = userProfile ? `${userProfile.first_name} ${userProfile.last_name}` : "User";
 
   return (
     <div className="flex h-screen w-full bg-background">
@@ -103,6 +132,19 @@ export default function Home() {
               ))}
             </div>
           )}
+        </div>
+
+        {/* User Profile Footer */}
+        <div className="p-4 border-t bg-muted/10">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary font-bold text-sm shrink-0">
+              {userInitial || <User className="w-4 h-4" />}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium truncate">{fullName}</p>
+              <p className="text-xs text-muted-foreground truncate">{userProfile?.email || ""}</p>
+            </div>
+          </div>
         </div>
       </aside>
 
