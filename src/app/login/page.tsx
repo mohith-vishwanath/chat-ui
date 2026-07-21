@@ -44,10 +44,8 @@ export default function LoginPage() {
       
       if (data.access_token) {
         localStorage.setItem("access_token", data.access_token);
-        if (data.firstname) localStorage.setItem("firstname", data.firstname);
-        if (data.lastname) localStorage.setItem("lastname", data.lastname);
-        if (data.email) localStorage.setItem("email", data.email);
-        router.push("/");
+        // Refresh the page and navigate to home
+        window.location.href = "/";
       } else {
         throw new Error("No access token received");
       }

@@ -49,17 +49,28 @@ export default function Home() {
       }
     };
 
-    const loadProfileFromStorage = () => {
-      const firstname = localStorage.getItem("firstname");
-      const lastname = localStorage.getItem("lastname");
-      const email = localStorage.getItem("email");
-      
-      if (firstname || lastname || email) {
-        setUserProfile({
-          first_name: firstname || "",
-          last_name: lastname || "",
-          email: email || ""
+    const fetchProfile = async (token: string) => {
+      try {
+        const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "";
+        const response = await fetch(`${backendUrl}/api/user`, {
+          headers: {
+            "Authorization": `Bearer ${token}`,
+          }
         });
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch user profile");
+        }
+
+        const data = await response.json();
+        setUserProfile({
+          first_name: data.firstname || "",
+          last_name: data.lastname || "",
+          email: data.email || ""
+        });
+      } catch (err) {
+        console.error("Failed to fetch profile:", err);
+        router.push("/login");
       }
     };
 
@@ -68,8 +79,8 @@ export default function Home() {
       router.push("/login");
     } else {
       setIsAuthenticated(true);
+      fetchProfile(token);
       fetchChats(token);
-      loadProfileFromStorage();
     }
   }, [router]);
 
