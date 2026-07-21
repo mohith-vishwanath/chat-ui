@@ -13,7 +13,7 @@ permissions:
 
 jobs:
   deploy:
-    name: Deploy to Amazon ECS
+    name: Deploy to Amazon ECS Fargate
     runs-on: ubuntu-latest
     
     # Dynamically select the environment based on what triggered the run
@@ -59,7 +59,7 @@ jobs:
           container-name: ${{ vars.ECS_CONTAINER_NAME }}
           image: ${{ steps.build-image.outputs.image }}
 
-      - name: Deploy Amazon ECS task definition
+      - name: Deploy Amazon ECS Fargate task definition
         uses: aws-actions/amazon-ecs-deploy-task-definition@v2
         with:
           task-definition: ${{ steps.render-task-def.outputs.task-definition }}
