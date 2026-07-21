@@ -64,8 +64,8 @@ export default function Home() {
 
         const data = await response.json();
         setUserProfile({
-          first_name: data.firstname || "",
-          last_name: data.lastname || "",
+          first_name: data.first_name || "",
+          last_name: data.last_name || "",
           email: data.email || ""
         });
       } catch (err) {
