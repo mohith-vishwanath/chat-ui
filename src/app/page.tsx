@@ -1,121 +1,53 @@
 "use client";
 
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
+  const router = useRouter();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-    setIsLoading(true);
-
-    try {
-      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "";
-      const response = await fetch(`${backendUrl}/api/auth/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Invalid credentials or server error");
-      }
-
-      const data = await response.json();
-      
-      if (data.access_token) {
-        // Store the token for subsequent calls
-        localStorage.setItem("access_token", data.access_token);
-        // You could redirect the user here using next/navigation useRouter
-        // e.g., router.push("/chat")
-        alert("Login successful!");
-      } else {
-        throw new Error("No access token received");
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred during login");
-    } finally {
-      setIsLoading(false);
+  useEffect(() => {
+    // Check if the user is authenticated on the client side
+    const token = localStorage.getItem("access_token");
+    if (!token) {
+      router.push("/login");
+    } else {
+      setIsAuthenticated(true);
     }
-  };
+  }, [router]);
 
-  const isFormValid = email.trim() !== "" && password.trim() !== "";
+  // Don't render the chat UI until we confirm authentication
+  if (!isAuthenticated) {
+    return (
+      <main className="flex flex-1 items-center justify-center p-4 h-screen">
+        <div>Loading...</div>
+      </main>
+    );
+  }
 
   return (
-    <main className="flex flex-1 items-center justify-center p-4">
-      <Card className="w-full max-w-sm">
-        <CardHeader>
-          <CardTitle className="text-2xl">Login</CardTitle>
-          <CardDescription>
-            Enter your credentials to access your account.
-          </CardDescription>
-        </CardHeader>
-        <form onSubmit={handleLogin}>
-          <CardContent className="grid gap-4">
-            <div className="grid gap-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="m@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-            </div>
-            {error && <div className="text-sm text-destructive">{error}</div>}
-          </CardContent>
-          <CardFooter className="flex-col gap-4">
-            <Button 
-              type="submit" 
-              className="w-full" 
-              disabled={!isFormValid || isLoading}
-            >
-              {isLoading ? "Signing in..." : "Sign in"}
-            </Button>
-            <div className="relative w-full">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t" />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-background px-2 text-muted-foreground">
-                  Or continue with
-                </span>
-              </div>
-            </div>
-            <Button variant="outline" className="w-full" disabled type="button">
-              Single Sign-On (SSO)
-            </Button>
-          </CardFooter>
-        </form>
-      </Card>
+    <main className="flex flex-1 flex-col p-4 h-screen max-w-4xl mx-auto w-full">
+      <header className="py-4 border-b">
+        <h1 className="text-2xl font-bold">Chat</h1>
+      </header>
+      
+      <div className="flex-1 overflow-y-auto p-4 border rounded-md my-4">
+        <p className="text-muted-foreground text-center mt-10">
+          Chat messages will appear here.
+        </p>
+      </div>
+
+      <div className="flex gap-2">
+        <input 
+          type="text" 
+          placeholder="Type a message..." 
+          className="flex-1 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+        />
+        <button className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2">
+          Send
+        </button>
+      </div>
     </main>
   );
 }
