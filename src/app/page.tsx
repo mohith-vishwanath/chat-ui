@@ -49,21 +49,17 @@ export default function Home() {
       }
     };
 
-    const fetchProfile = async (token: string) => {
-      try {
-        const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "";
-        const response = await fetch(`${backendUrl}/api/auth/me`, {
-          headers: {
-            "Authorization": `Bearer ${token}`,
-          }
+    const loadProfileFromStorage = () => {
+      const firstname = localStorage.getItem("firstname");
+      const lastname = localStorage.getItem("lastname");
+      const email = localStorage.getItem("email");
+      
+      if (firstname || lastname || email) {
+        setUserProfile({
+          first_name: firstname || "",
+          last_name: lastname || "",
+          email: email || ""
         });
-
-        if (response.ok) {
-          const data = await response.json();
-          setUserProfile(data);
-        }
-      } catch (err) {
-        console.error("Failed to fetch profile:", err);
       }
     };
 
@@ -73,7 +69,7 @@ export default function Home() {
     } else {
       setIsAuthenticated(true);
       fetchChats(token);
-      fetchProfile(token);
+      loadProfileFromStorage();
     }
   }, [router]);
 
@@ -86,7 +82,7 @@ export default function Home() {
   }
 
   const userInitial = userProfile?.first_name?.[0]?.toUpperCase() || "";
-  const fullName = userProfile ? `${userProfile.first_name} ${userProfile.last_name}` : "User";
+  const fullName = userProfile ? `${userProfile.first_name} ${userProfile.last_name}`.trim() : "User";
 
   return (
     <div className="flex h-screen w-full bg-background">
