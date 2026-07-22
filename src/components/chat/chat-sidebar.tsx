@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertCircle, Hexagon, MessageSquare, User, Sparkles, Briefcase } from "lucide-react";
+import { AlertCircle, Hexagon, MessageSquare, User, Sparkles, Briefcase, MessageCircle } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { setSelectedChatId } from "@/store/chatSlice";
 
@@ -33,7 +33,7 @@ export function ChatSidebar() {
             Agents Marketplace
           </div>
           <div className="flex flex-col gap-1">
-            <button className="flex items-center gap-2 px-2 py-2 rounded-md hover:bg-muted/50 text-muted-foreground text-sm text-left transition-colors">
+            <button className="flex items-center gap-2 px-2 py-2 rounded-md hover:bg-muted/50 text-muted-foreground text-sm text-left transition-colors cursor-pointer">
               <Briefcase className="w-4 h-4 shrink-0" />
               <span className="truncate">Customer Visit Prep</span>
             </button>
@@ -42,7 +42,8 @@ export function ChatSidebar() {
 
         {/* Chat List Section */}
         <div>
-          <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3 px-2">
+          <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3 px-2 flex items-center gap-2">
+            <MessageCircle className="w-3 h-3" />
             Your Chats
           </div>
           
@@ -63,7 +64,7 @@ export function ChatSidebar() {
                 <button 
                   key={chat.id}
                   onClick={() => dispatch(setSelectedChatId(chat.id))}
-                  className={`flex items-center gap-2 px-2 py-2 rounded-md text-sm text-left transition-colors ${
+                  className={`flex items-center gap-2 px-2 py-2 rounded-md text-sm text-left transition-colors cursor-pointer ${
                     selectedChatId === chat.id 
                       ? "bg-muted font-medium text-foreground" 
                       : "hover:bg-muted/50 text-muted-foreground"
