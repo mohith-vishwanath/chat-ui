@@ -76,9 +76,14 @@ export function ChatSidebar() {
           {isLoadingWorkflows ? (
             <div className="px-2 text-sm text-muted-foreground">Loading agents...</div>
           ) : workflowsError ? (
-            <div className="px-2 text-sm text-destructive">Failed to load agents</div>
+            <div className="px-2 py-4 flex flex-col items-center justify-center text-center text-sm text-destructive gap-2">
+              <AlertCircle className="w-8 h-8 opacity-80" />
+              <p>Unable to fetch the available agents.</p>
+            </div>
           ) : workflows.length === 0 ? (
-            <div className="px-2 text-sm text-muted-foreground">No agents available.</div>
+            <div className="px-2 py-4 text-center text-sm text-muted-foreground">
+              No agents available.
+            </div>
           ) : (
             <div className="flex flex-col gap-1">
               {workflows.map((workflow) => (
