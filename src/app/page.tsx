@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { AlertCircle, Hexagon, MessageSquare, User } from "lucide-react";
+import { AlertCircle, Hexagon, MessageSquare, User, ArrowUp } from "lucide-react";
 
 interface Chat {
   id: string;
@@ -24,6 +24,7 @@ export default function Home() {
   const [isLoadingChats, setIsLoadingChats] = useState(true);
   const [chatsError, setChatsError] = useState(false);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [message, setMessage] = useState("");
 
   useEffect(() => {
     const fetchChats = async (token: string) => {
@@ -170,14 +171,19 @@ export default function Home() {
         </div>
 
         <div className="p-4 bg-background border-t">
-          <div className="flex gap-2 max-w-4xl mx-auto w-full">
+          <div className="relative flex max-w-4xl mx-auto w-full items-center">
             <input 
               type="text" 
               placeholder="Type a message..." 
-              className="flex-1 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              className="flex-1 flex h-12 w-full rounded-full border border-input bg-background px-4 py-2 pr-14 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
             />
-            <button className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 shrink-0">
-              Send
+            <button 
+              disabled={message.trim() === ""}
+              className="absolute right-1 inline-flex items-center justify-center rounded-full text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 w-10 h-10 shrink-0"
+            >
+              <ArrowUp className="w-5 h-5" />
             </button>
           </div>
         </div>
