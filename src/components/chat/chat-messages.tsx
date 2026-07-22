@@ -82,7 +82,7 @@ export function ChatMessages() {
 
   const renderInput = (isCentered: boolean) => (
     <div className={`w-full max-w-4xl mx-auto ${isCentered ? 'mt-8' : ''}`}>
-      <div className="relative flex items-center shadow-sm">
+      <div className="relative flex items-center">
         <input 
           type="text" 
           placeholder="Type a message..." 
@@ -91,7 +91,7 @@ export function ChatMessages() {
           onKeyDown={(e) => {
             if (e.key === 'Enter') handleSendMessage();
           }}
-          className="flex-1 flex h-14 w-full rounded-full border border-input bg-background px-5 py-2 pr-14 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+          className="flex-1 flex h-14 w-full rounded-full border border-input bg-background px-5 py-2 pr-14 text-sm shadow-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
         />
         <button 
           onClick={handleSendMessage}

@@ -4,20 +4,14 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAppDispatch } from "@/store/hooks";
 import { setChats, setChatsError, setChatsLoading } from "@/store/chatSlice";
+import { setUserProfile } from "@/store/userSlice";
 import { ChatSidebar } from "@/components/chat/chat-sidebar";
 import { ChatMessages } from "@/components/chat/chat-messages";
-
-interface UserProfile {
-  first_name: string;
-  last_name: string;
-  email: string;
-}
 
 export default function Home() {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
 
   useEffect(() => {
     const fetchChats = async (token: string) => {
@@ -58,11 +52,11 @@ export default function Home() {
         }
 
         const data = await response.json();
-        setUserProfile({
+        dispatch(setUserProfile({
           first_name: data.first_name || "",
           last_name: data.last_name || "",
           email: data.email || ""
-        });
+        }));
       } catch (err) {
         console.error("Failed to fetch profile:", err);
         router.push("/login");
@@ -89,7 +83,7 @@ export default function Home() {
 
   return (
     <div className="flex h-screen w-full bg-background overflow-hidden">
-      <ChatSidebar userProfile={userProfile} />
+      <ChatSidebar />
       <ChatMessages />
     </div>
   );

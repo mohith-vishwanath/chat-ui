@@ -4,19 +4,10 @@ import { AlertCircle, Hexagon, MessageSquare, User } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { setSelectedChatId } from "@/store/chatSlice";
 
-interface UserProfile {
-  first_name: string;
-  last_name: string;
-  email: string;
-}
-
-interface ChatSidebarProps {
-  userProfile: UserProfile | null;
-}
-
-export function ChatSidebar({ userProfile }: ChatSidebarProps) {
+export function ChatSidebar() {
   const dispatch = useAppDispatch();
   const { chats, isLoadingChats, chatsError, selectedChatId } = useAppSelector((state) => state.chat);
+  const userProfile = useAppSelector((state) => state.user.profile);
 
   const userInitial = userProfile?.first_name?.[0]?.toUpperCase() || "";
   const fullName = userProfile ? `${userProfile.first_name} ${userProfile.last_name}`.trim() : "User";
