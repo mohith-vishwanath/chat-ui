@@ -1,13 +1,53 @@
 "use client";
 
-import { AlertCircle, Hexagon, MessageSquare, User, Sparkles, Briefcase, MessageCircle } from "lucide-react";
+import { useEffect, useState } from "react";
+import { AlertCircle, Hexagon, MessageSquare, User, Sparkles, MessageCircle } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { setSelectedChatId } from "@/store/chatSlice";
+
+interface Workflow {
+  workflow_id: string;
+  name: string;
+}
 
 export function ChatSidebar() {
   const dispatch = useAppDispatch();
   const { chats, isLoadingChats, chatsError, selectedChatId } = useAppSelector((state) => state.chat);
   const userProfile = useAppSelector((state) => state.user.profile);
+
+  const [workflows, setWorkflows] = useState<Workflow[]>([]);
+  const [isLoadingWorkflows, setIsLoadingWorkflows] = useState(true);
+  const [workflowsError, setWorkflowsError] = useState(false);
+
+  useEffect(() => {
+    const fetchWorkflows = async () => {
+      try {
+        const token = localStorage.getItem("access_token");
+        if (!token) return;
+
+        const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "";
+        const response = await fetch(`${backendUrl}/api/workflows`, {
+          headers: {
+            "Authorization": `Bearer ${token}`,
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch workflows");
+        }
+
+        const data = await response.json();
+        setWorkflows(data);
+      } catch (err) {
+        console.error(err);
+        setWorkflowsError(true);
+      } finally {
+        setIsLoadingWorkflows(false);
+      }
+    };
+
+    fetchWorkflows();
+  }, []);
 
   const userInitial = userProfile?.first_name?.[0]?.toUpperCase() || "";
   const fullName = userProfile ? `${userProfile.first_name} ${userProfile.last_name}`.trim() : "User";
@@ -32,12 +72,25 @@ export function ChatSidebar() {
             <Sparkles className="w-3 h-3" />
             Agents Marketplace
           </div>
-          <div className="flex flex-col gap-1">
-            <button className="flex items-center gap-2 px-2 py-2 rounded-md hover:bg-muted/50 text-muted-foreground text-sm text-left transition-colors cursor-pointer">
-              <Briefcase className="w-4 h-4 shrink-0" />
-              <span className="truncate">Customer Visit Prep</span>
-            </button>
-          </div>
+          
+          {isLoadingWorkflows ? (
+            <div className="px-2 text-sm text-muted-foreground">Loading agents...</div>
+          ) : workflowsError ? (
+            <div className="px-2 text-sm text-destructive">Failed to load agents</div>
+          ) : workflows.length === 0 ? (
+            <div className="px-2 text-sm text-muted-foreground">No agents available.</div>
+          ) : (
+            <div className="flex flex-col gap-1">
+              {workflows.map((workflow) => (
+                <button 
+                  key={workflow.workflow_id}
+                  className="flex items-center px-2 py-2 rounded-md hover:bg-muted/50 text-muted-foreground text-sm text-left transition-colors cursor-pointer"
+                >
+                  <span className="truncate">{workflow.name}</span>
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Chat List Section */}
