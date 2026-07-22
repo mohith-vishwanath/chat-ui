@@ -80,6 +80,35 @@ export function ChatMessages() {
     setMessageText("");
   };
 
+  const renderInput = (isCentered: boolean) => (
+    <div className={`w-full max-w-4xl mx-auto ${isCentered ? 'mt-8' : ''}`}>
+      <div className="relative flex items-center shadow-sm">
+        <input 
+          type="text" 
+          placeholder="Type a message..." 
+          value={messageText || ""}
+          onChange={(e) => setMessageText(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') handleSendMessage();
+          }}
+          className="flex-1 flex h-14 w-full rounded-full border border-input bg-background px-5 py-2 pr-14 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+        />
+        <button 
+          onClick={handleSendMessage}
+          disabled={!messageText || messageText.trim() === ""}
+          className="absolute right-1.5 inline-flex items-center justify-center rounded-full text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 w-11 h-11 shrink-0"
+        >
+          <ArrowUp className="w-5 h-5" />
+        </button>
+      </div>
+      {isCentered && (
+        <p className="text-center text-xs text-muted-foreground mt-4">
+          AI can make mistakes. Verify important information.
+        </p>
+      )}
+    </div>
+  );
+
   return (
     <main className="flex-1 flex flex-col h-screen min-w-0 bg-background">
       {/* Dynamic Header */}
@@ -92,14 +121,15 @@ export function ChatMessages() {
       {/* Chat Area */}
       <div className="flex-1 overflow-y-auto">
         {isNewChat ? (
-          <div className="flex flex-col items-center justify-center h-full max-w-2xl mx-auto px-4">
+          <div className="flex flex-col items-center justify-center h-full max-w-3xl mx-auto px-4">
             <div className="bg-primary text-primary-foreground p-3 rounded-2xl mb-6 shadow-md">
               <Hexagon className="w-12 h-12 fill-current" />
             </div>
             <h2 className="text-2xl font-bold mb-2">How can I help you today?</h2>
-            <p className="text-muted-foreground text-center mb-8">
+            <p className="text-muted-foreground text-center mb-4">
               Send a message to start a new conversation.
             </p>
+            {renderInput(true)}
           </div>
         ) : (
           <div className="p-6 max-w-4xl mx-auto w-full flex flex-col gap-6 pb-8">
@@ -136,33 +166,12 @@ export function ChatMessages() {
         )}
       </div>
 
-      {/* Input Area */}
-      <div className={`p-4 bg-background border-t ${isNewChat ? 'border-none pb-12' : ''}`}>
-        <div className="relative flex max-w-4xl mx-auto w-full items-center shadow-sm">
-          <input 
-            type="text" 
-            placeholder="Type a message..." 
-            value={messageText || ""}
-            onChange={(e) => setMessageText(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') handleSendMessage();
-            }}
-            className="flex-1 flex h-14 w-full rounded-full border border-input bg-background px-5 py-2 pr-14 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-          />
-          <button 
-            onClick={handleSendMessage}
-            disabled={!messageText || messageText.trim() === ""}
-            className="absolute right-1.5 inline-flex items-center justify-center rounded-full text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 w-11 h-11 shrink-0"
-          >
-            <ArrowUp className="w-5 h-5" />
-          </button>
+      {/* Bottom Input Area - Only shown when not in new chat mode */}
+      {!isNewChat && (
+        <div className="p-4 bg-background border-t">
+          {renderInput(false)}
         </div>
-        {isNewChat && (
-          <p className="text-center text-xs text-muted-foreground mt-4">
-            AI can make mistakes. Verify important information.
-          </p>
-        )}
-      </div>
+      )}
     </main>
   );
 }
